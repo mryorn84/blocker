@@ -1,6 +1,9 @@
-android {
-    namespace "com.example.youtubeblocker" // اینو اضافه کن
+plugins {
+    id 'com.android.application'
+}
 
+android {
+    namespace "com.example.youtubeblocker"
     compileSdk 34
 
     defaultConfig {
@@ -17,4 +20,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+}
+
+dependencies {
+    // اگر نیاز به کتابخونه خاصی نداری می‌تونی خالی بذاری
 }
