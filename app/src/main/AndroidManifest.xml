@@ -1,9 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- مجوز دسترسی به Usage Stats -->
     <uses-permission
         android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions" />
+
+    <!-- مجوز باز کردن پنجره روی سایر برنامه‌ها (اختیاری برای توسعه بیشتر) -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <application
@@ -11,6 +14,7 @@
         android:label="YouTube Blocker"
         android:theme="@android:style/Theme">
 
+        <!-- اکتیویتی اصلی -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -21,6 +25,13 @@
             </intent-filter>
 
         </activity>
+
+        <!-- سرویس مانیتورینگ -->
+        <service
+            android:name=".MonitorService"
+            android:exported="false"
+            android:foregroundServiceType="none" />
+
     </application>
 
 </manifest>
