@@ -7,7 +7,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.provider.Settings;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
@@ -15,7 +18,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+
+        // به جای فایل layout، مستقیم یک TextView می‌سازیم
+        TextView txt = new TextView(this);
+        txt.setText("YouTube Blocker فعال است");
+        txt.setTextSize(20);
+        txt.setGravity(Gravity.CENTER);
+        setContentView(txt);
 
         if (!hasUsageStatsPermission(this)) {
             startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
