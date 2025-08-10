@@ -1,13 +1,13 @@
 package com.example.youtubeblocker;
 
 import android.app.AppOpsManager;
-import android.app.usage.UsageEvents;
-import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.Intent;
-import android.provider.Settings;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.Gravity;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,19 +19,40 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // به جای فایل layout، مستقیم یک TextView می‌سازیم
-        TextView txt = new TextView(this);
-        txt.setText("YouTube Blocker فعال است");
-        txt.setTextSize(20);
-        txt.setGravity(Gravity.CENTER);
-        setContentView(txt);
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(50, 50, 50, 50);
 
-        if (!hasUsageStatsPermission(this)) {
-            startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
-            Toast.makeText(this, "لطفاً اجازه دسترسی به Usage Stats را فعال کنید", Toast.LENGTH_LONG).show();
-        } else {
-            new Thread(this::monitorApps).start();
-        }
+        TextView txt = new TextView(this);
+        txt.setText("YouTube Blocker\n= بررسی و مسدود کردن یوتیوب");
+        txt.setTextSize(18);
+        txt.setGravity(Gravity.CENTER);
+        layout.addView(txt);
+
+        Button startBtn = new Button(this);
+        startBtn.setText("Start blocking");
+        startBtn.setOnClickListener(v -> {
+            if (!hasUsageStatsPermission(this)) {
+                startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
+                Toast.makeText(this, "لطفاً در صفحه باز شده اجازه 'Usage access' را به این برنامه بدهید، سپس دوباره برگردید و Start را بزنید.", Toast.LENGTH_LONG).show();
+                return;
+            }
+            Intent svc = new Intent(this, MonitorService.class);
+            startForegroundService(svc);
+            Toast.makeText(this, "سرویس شروع شد", Toast.LENGTH_SHORT).show();
+        });
+        layout.addView(startBtn);
+
+        Button stopBtn = new Button(this);
+        stopBtn.setText("Stop blocking");
+        stopBtn.setOnClickListener(v -> {
+            Intent svc = new Intent(this, MonitorService.class);
+            stopService(svc);
+            Toast.makeText(this, "سرویس متوقف شد", Toast.LENGTH_SHORT).show();
+        });
+        layout.addView(stopBtn);
+
+        setContentView(layout);
     }
 
     private boolean hasUsageStatsPermission(Context context) {
@@ -39,29 +60,5 @@ public class MainActivity extends AppCompatActivity {
         int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
                 android.os.Process.myUid(), context.getPackageName());
         return mode == AppOpsManager.MODE_ALLOWED;
-    }
-
-    private void monitorApps() {
-        UsageStatsManager usm = (UsageStatsManager) getSystemService(Context.USAGE_STATS_SERVICE);
-        String targetPackage = "com.google.android.youtube";
-
-        while (true) {
-            long end = System.currentTimeMillis();
-            long begin = end - 2000;
-            UsageEvents events = usm.queryEvents(begin, end);
-            UsageEvents.Event event = new UsageEvents.Event();
-
-            while (events.hasNextEvent()) {
-                events.getNextEvent(event);
-                if (event.getEventType() == UsageEvents.Event.MOVE_TO_FOREGROUND &&
-                        event.getPackageName().equals(targetPackage)) {
-                    Intent homeIntent = new Intent(Intent.ACTION_MAIN);
-                    homeIntent.addCategory(Intent.CATEGORY_HOME);
-                    homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(homeIntent);
-                }
-            }
-            try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); }
-        }
     }
 }
