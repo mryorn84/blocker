@@ -1,3 +1,5 @@
 <resources>
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar" />
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- رنگ‌ها رو اگه خواستی بعداً میتونی تغییر بدی -->
+    </style>
 </resources>
